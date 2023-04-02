@@ -25,7 +25,6 @@ contract WOOYPODs is ERC721, ERC721URIStorage, Pausable, Ownable {
     }
 
     mapping(bytes32 => uint256) private userToken;
-    mapping(bytes32 => bool) private alreadyMinted;
 
     function safeMint(address to, string memory uri, bytes32 userTokenValue) public onlyOwner {
         require(to != address(0), "Invalid recipient address");
@@ -37,13 +36,17 @@ contract WOOYPODs is ERC721, ERC721URIStorage, Pausable, Ownable {
         _setTokenURI(tokenId, uri);
         _tokenURIs[tokenId] = uri;
         userToken[userTokenValue] = tokenId;
-        alreadyMinted[userTokenValue] = true;
     }
 
     function getTokenIdByUserToken(bytes32 userTokenValue) public view returns (uint256) {
         require(userTokenValue != "", "User token value cannot be empty");
-        require(alreadyMinted[userTokenValue] == true, "User token value not found");
         return userToken[userTokenValue];
+    }
+
+    function updateTokenURI(uint256 tokenId, string memory uri) public onlyOwner {
+        require(_exists(tokenId), "Token ID does not exist");
+        _setTokenURI(tokenId, uri);
+        _tokenURIs[tokenId] = uri;
     }
 
     function tokenURI(uint256 tokenId) 
